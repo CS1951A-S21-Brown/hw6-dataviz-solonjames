@@ -4,8 +4,8 @@ const MAX_HEIGHT = 720;
 const margin = { top: 40, right: 100, bottom: 40, left: 175 };
 
 // Assumes the same graph width, height dimensions as the example dashboard. Feel free to change these if you'd like
-let graph_1_width = (MAX_WIDTH / 2) - 10, graph_1_height = 250;
-let graph_2_width = (MAX_WIDTH / 2) - 10, graph_2_height = 275;
+let graph_1_width = MAX_WIDTH, graph_1_height = 400;
+let graph_2_width = MAX_WIDTH, graph_2_height = 400;
 let graph_3_width = MAX_WIDTH / 2, graph_3_height = 575;
 
 //graph 1
@@ -14,7 +14,7 @@ let graph_3_width = MAX_WIDTH / 2, graph_3_height = 575;
 let svg = d3.select("body")
     .append("svg")
     .attr("width", graph_1_width)
-    .attr("height", graph_2_height)
+    .attr("height", graph_1_height)
     .append("g")
     .attr("transform", "translate(200, 40)");
 
@@ -103,6 +103,52 @@ function setData(allTime) {
 
     });
 }
+
+//graph 2 Map with region data displayed overhead
+let svg2 = d3.select("body")
+    .append("svg")
+    .attr("width", graph_2_width)
+    .attr("height", graph_2_height)
+
+let title2 = svg2.append("text")
+    .attr("transform", "translate(250, 30)")
+    .style("text-anchor", "middle")
+    .style("font-size", 15)
+    .text("Best Selling Video Game Genere by Region")
+
+var projection = d3.geoNaturalEarth()
+    .scale((graph_2_width - 750) / 1.3 / Math.PI)
+    .translate([graph_2_width / 2, graph_2_height / 2]);
+
+
+Promise.all([d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"), d3.csv("../data/video_games.csv")]).then(([data, data2]) => {
+    const regionNA = new Set(["USA", "CAN", "MEX"]);
+    const regionEU = new Set(["AUT", "BEL", "BGR", "HRV", "CYP", "CZE", "DNK", "EST", "FIN", "FRA", "DEU", "GRC", "HUN", "IRL", "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE"]);
+    const regionJP = new Set(["JPN"]);
+
+    const getMaxGenre = (refData, region) => d3.least(d3.rollup(refData, v => d3.sum(v, d => d[region + "_Sales"]), d => d.Genre), ([, sum]) => -sum)[0]
+
+    const genreToColorMap = {
+        "Action": "#f54242",
+        "Role-Playing": "#4287f5"
+    }
+    console.log(getMaxGenre(data2, "JP"));
+    console.log(genreToColorMap[getMaxGenre(data2, "JP")]);
+    const beepBoop100k = svg2.append("g")
+        .selectAll("path");
+    const colorRegion = (region, color) => beepBoop100k
+        .data(data.features.filter((x) => (region === undefined && !regionEU.has(x.id) && !regionNA.has(x.id) && !regionJP.has(x.id)) || (region !== undefined && region.has(x.id))))
+        .enter().append("path")
+        .attr("fill", color)
+        .attr("d", d3.geoPath()
+            .projection(projection)
+        )
+        .style("stroke", "#fff");
+    colorRegion(regionNA, genreToColorMap[getMaxGenre(data2, "NA")]);
+    colorRegion(regionEU, genreToColorMap[getMaxGenre(data2, "EU")]);
+    colorRegion(regionJP, genreToColorMap[getMaxGenre(data2, "JP")]);
+    colorRegion(undefined, genreToColorMap[getMaxGenre(data2, "Other")]);
+});
 
 function cleanDataByYear(data, allTime, yearInterested) {
     if (allTime) {
