@@ -6,7 +6,7 @@ const margin = { top: 40, right: 100, bottom: 40, left: 175 };
 // Assumes the same graph width, height dimensions as the example dashboard. Feel free to change these if you'd like
 let graph_1_width = MAX_WIDTH, graph_1_height = 400;
 let graph_2_width = MAX_WIDTH, graph_2_height = 400;
-let graph_3_width = MAX_WIDTH / 2, graph_3_height = 575;
+let graph_3_width = MAX_WIDTH, graph_3_height = 400;
 
 //graph 1
 
@@ -62,14 +62,15 @@ function setData(allTime) {
         x.domain([0, d3.max(data, (d) => parseFloat(d.Global_Sales))]);
 
         //set y domain
-        y.domain(data.map(x => x.Name));
+        console.log(data.map(x => x.Name + ": " + x.Platform));
+        y.domain(data.map(x => x.Name + ": " + x.Platform));
 
         y_axis_label.call(d3.axisLeft(y).tickSize(0).tickPadding(10));
         let bars = svg.selectAll("rect").data(data);
 
 
         let color = d3.scaleOrdinal()
-            .domain(data.map(function (d) { return d.Name }))
+            .domain(data.map(function (d) { return d.Name + ": " + d.Platform }))
             .range(d3.quantize(d3.interpolateHcl("#66a0e2", "#81c2c3"), 10));
 
         bars.enter()
@@ -78,8 +79,8 @@ function setData(allTime) {
             .transition()
             .duration(1000)
             .attr("x", x(0))
-            .attr("y", (d) => y(d.Name))
-            .attr("fill", function (d) { return color(d.Name) })
+            .attr("y", (d) => y(d.Name + ": " + d.Platform))
+            .attr("fill", function (d) { return color(d.Name + ": " + d.Platform) })
             .attr("width", (d) => x(d.Global_Sales))
             .attr("height", y.bandwidth());
 
@@ -91,7 +92,7 @@ function setData(allTime) {
             .transition()
             .duration(1000)
             .attr("x", (d) => x(d.Global_Sales) + 5)
-            .attr("y", (d) => y(d.Name) + 11)
+            .attr("y", (d) => y(d.Name + ": " + d.Platform) + 11)
             .style("text-anchor", "start")
             .text((d) => d.Global_Sales);
 
@@ -119,6 +120,8 @@ let title2 = svg2.append("text")
 var projection = d3.geoNaturalEarth()
     .scale((graph_2_width - 750) / 1.3 / Math.PI)
     .translate([graph_2_width / 2, graph_2_height / 2]);
+
+
 
 
 Promise.all([d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"), d3.csv("../data/video_games.csv")]).then(([data, data2]) => {
@@ -150,10 +153,85 @@ Promise.all([d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/
     colorRegion(undefined, genreToColorMap[getMaxGenre(data2, "Other")]);
 });
 
+
+// graph 3
+let svg3 = d3.select("body")
+    .append("svg")
+    .attr("width", graph_1_width)
+    .attr("height", graph_1_height)
+    .append("g")
+    .attr("transform", "translate(200, 40)");
+
+var x3 = d3.scaleLinear()
+    .range([40, 400]);
+
+var y3 = d3.scaleBand()
+    .range([50, 500])
+    .padding(0.1);
+
+let countRef3 = svg.append("g");
+let y_axis_label3 = svg.append("g");
+
+//set up x label
+svg3.append("text")
+    .attr("transform", "translate(100, 200)")
+    .style("text-anchor", "middle")
+    .text("Global Sales");
+
+//set up y label
+let y_axis_text3 = svg3.append("text")
+    .attr("transform", "translate(-90, 15)")
+    .style("text-anchor", "middle")
+    .text("Game Name");
+
+//set up title
+let title3 = svg3.append("text")
+    .attr("transform", "translate(150, 15)")
+    .style("text-anchor", "middle")
+    .style("font-size", 15);
+
+d3.csv("../data/video_games.csv").then(function (data3) {
+    data3 = cleanDataByGenre(data3);
+    console.log(data3)
+
+    x3.domain([0, d3.max(data3, ([, d]) => parseFloat(d))]);
+
+    const genreList = new Set();
+    data3.forEach((y, x) => genreList.add(x.split("///")[0]));
+
+    const publisherList = new Set();
+    data3.forEach((y, x) => genreList.add(x.split("///")[1]));
+
+    let colorPublisher = d3.scaleOrdinal()
+        .domain([...publisherList])
+        .range(d3.quantize(d3.interpolateHcl("#66a0e2", "#81c2c3"), 100));
+
+    y3.domain([...genreList]);
+
+    console.log(y3("Sports"))
+
+    svg3.append('g')
+        .selectAll("dot")
+        .data(data3)
+        .enter()
+        .append("circle")
+        .attr("cx", function ([, d]) { return x3(parseFloat(d)); })
+        .attr("cy", function ([d,]) { return (y3(d.split("///")[0]) - 50) * 300 / 11 })
+        .attr("r", 4)
+        .style("fill", function ([d,]) { return colorPublisher(d.split("///")[1]) })
+
+});
+
+
+
 function cleanDataByYear(data, allTime, yearInterested) {
     if (allTime) {
         return data.sort((a, b) => b.Global_Sales - a.Global_Sales).slice(0, 10)
     } else {
         return data.filter((d) => d.Year == yearInterested).sort((a, b) => b.Global_Sales - a.Global_Sales).slice(0, 10)
     }
+}
+
+function cleanDataByGenre(data) {
+    return d3.rollup(data, v => d3.sum(v, d => d["Global_Sales"]), d => (d.Genre + "///" + d.Publisher));
 }
