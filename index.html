@@ -44,12 +44,57 @@
             <button type="button" class="btn btn-info" onclick="setData(false)">Submit Year</button>
             <div id="graph2"></div><br />
         </div>
-        <div class="col-lg-6">
-            <div id="graph3"></div>
-        </div>
     </div>
     <!--Feel free to add more JavaScript files as needed-->
     <script type="text/javascript" src="main.js"></script>
+    <div class="col-lg-6">
+        <div id="graph3"></div>
+        <div> Written Questions </div>
+
+        <p>1) The dashobard above answers the questions based on the video game sales dataset. The first graph is a
+            bar chart demonstrating the top selling games of all time or can be narrowed to a secific year by using
+            the Submit year field. The second dashboard is a map graph showing the top selling video games by region
+            and is color coded by game genre. Finally the last plot shows total video game sales broken down by
+            category and each publisher is represented. Additioanlly there is a dynamic toolip that computes a two
+            sample t-test for the data as is explained below the plot. In this way, the grpah explains information
+            both about total sales and average sales which both are relevant when answering a question of what is
+            the "best" publisher for a given category.</p>
+
+        <p>2) D3 was helpful in three ways during the process. FIrst, they have a usefull, built in map graph
+            templeate which was necessary to implement the map graph. Second it has some usefull built in reduction
+            methods like rollup which saved some time in data processing. Finally, D3 and using svgs helped by
+            making the webpage more responsive to various window sizes and not breaking in different settings.</p>
+
+        <p>3) Using D3 was difficult for three reasons. First, it is in javascript which I don't have any experience
+            with so I struggled a lot learning two new languages (HTML and JS) with limited examples/instruction.
+            Second, there are multiple versions of D3 and lots of the online documentation does not clarify which
+            version they are referencing. Finally, D3's internal documentation I found to be a bit lacking and
+            didn't provide enough examples for me to feel extremely confident in understanding eactly how it
+            functions.</p>
+
+        <p>4) As with most things, whil I made an effort to have the graph be accessible, there certainly is plenty
+            more thati would like to do given more skills or time. I sepfically tried to choose high contrast colors
+            (and tested on my colorblind roommate) where the colors are critical for understanding so I hope that
+            colorblind users will be able to use my dashboard effectively. WIth that said, the second article
+            mentions that things like hover over tooltips are not very accessible because they dont work well with
+            text to speech overlays so I would like to potentially improve this by making the tooltip always visible
+            or some other method to adapting to visually impared users. THe map plot has similar problems bescause
+            the information is purely visible (no text) and thus an impared user would have trouble getting the
+            relevant information.</p>
+
+        <p>5) There are a couple of things that I could have implemented in my workflow that would be helpful. As
+            is, there isn't a large amount of extra space in my figures but if I budgeted space better at the
+            beggining I would have set aside some space to write a single sentance summary of the results of each
+            graph. Withmore time, these summaries couldeven ahve been dynamic based on the dynmaic elements of the
+            graph. Another additional thing I could have done is asked early about the tooltip requirement. I
+            assumed that it had to be hover-over but, now that I know this isn't accesible for some users, I could
+            have asked a question earlier in the process to see if there is an accessible way to mee the
+            requirements of the project.</p>
+
+        <p>Extra Credit: Used dynamic t-test for graph 3, Used map type plot for graph 2. I also saw on piazza that if
+            our dashboard still looks ok in various window sizes then we also get some extra credit and I think mine
+            does but not exactly sure if it counts.</p>
+    </div>
 </body>
 
 </html>

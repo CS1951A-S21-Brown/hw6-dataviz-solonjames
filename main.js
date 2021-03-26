@@ -5,7 +5,7 @@ const margin = { top: 40, right: 100, bottom: 40, left: 175 };
 
 // Assumes the same graph width, height dimensions as the example dashboard. Feel free to change these if you'd like
 let graph_1_width = (MAX_WIDTH / 2) - 10, graph_1_height = 250;
-let graph_2_width = (MAX_WIDTH / 2) - 10, graph_2_height = 275;
+let graph_2_width = ((MAX_WIDTH / 2) - 10) * 1.5, graph_2_height = (275) * 1.5;
 let graph_3_width = MAX_WIDTH / 2, graph_3_height = 575;
 
 //graph 1
@@ -117,7 +117,7 @@ let title2 = svg2.append("text")
     .text("Best Selling Video Game Genere by Region")
 
 let legend2 = svg2.append("text")
-    .attr("transform", `translate(${graph_2_width / 2}, 270)`)
+    .attr("transform", `translate(${graph_2_width / 2}, ${graph_2_height - margin.bottom + 30})`)
     .style("text-anchor", "middle")
     .style("font-size", 15)
     .text("Red: Action, Blue: Role-Playing")
@@ -247,6 +247,26 @@ d3.csv("../data/video_games.csv").then(function (data3) {
                 .duration(200)
                 .style("opacity", 0);
         });
+
+    let explanation3a = svg3.append("text")
+        .attr("transform", `translate(${(graph_3_width) / 2 - margin.left}, ${graph_3_height - margin.top + 40})`)
+        .style("text-anchor", "middle")
+        .text("The p value indicated in the tool tip is the result of a two sample t-test");
+
+    let explanation3b = svg3.append("text")
+        .attr("transform", `translate(${(graph_3_width) / 2 - margin.left}, ${graph_3_height - margin.top + 60})`)
+        .style("text-anchor", "middle")
+        .text("with the null hypothesis of: The mean value of the releases in the given category");
+
+    let explanation3c = svg3.append("text")
+        .attr("transform", `translate(${(graph_3_width) / 2 - margin.left}, ${graph_3_height - margin.top + 80})`)
+        .style("text-anchor", "middle")
+        .text("by the selected publisher is equal to the mean mean value of the releases in the");
+
+    let explanation3d = svg3.append("text")
+        .attr("transform", `translate(${(graph_3_width) / 2 - margin.left}, ${graph_3_height - margin.top + 100})`)
+        .style("text-anchor", "middle")
+        .text("given category not by the given publisher.");
 
 
 });
